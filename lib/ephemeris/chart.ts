@@ -1,10 +1,14 @@
 import "server-only";
 
+import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 
 import SwissEPH from "@/lib/ephemeris/sweph";
 import { localWallTimeToUtcParts } from "@/lib/geo/timezone";
 import { normalizeLongitude } from "@/lib/hd/gates";
+
+const require = createRequire(path.join(process.cwd(), "package.json"));
 
 export type BirthContext = {
   julianDayUt: number;
@@ -21,8 +25,12 @@ export async function getSweph(): Promise<SwissEph> {
   if (cached) return cached;
   if (!initPromise) {
     initPromise = (async () => {
-      const wasmPath = path.join(process.cwd(), "node_modules/sweph-wasm/dist/wasm/swisseph.wasm");
-      const swe = await SwissEPH.init(wasmPath);
+      const pkgDist = path.dirname(require.resolve("sweph-wasm"));
+      const wasmPath = path.join(pkgDist, "wasm", "swisseph.wasm");
+      const wasmBinary = fs.readFileSync(wasmPath);
+      const loadWasm = require(path.join(pkgDist, "wasm", "swisseph.cjs")).default;
+      const wasmModule = await loadWasm({ wasmBinary });
+      const swe = new SwissEPH(wasmModule);
       await swe.swe_set_ephe_path();
       cached = swe;
       return swe;
