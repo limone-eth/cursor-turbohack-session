@@ -6,15 +6,11 @@ Upstream equivalents are installable from npm; these copies exist as readable re
 
 ## Chart computation
 
-### `sweph-wasm/`  — Swiss Ephemeris in WebAssembly
+### Swiss Ephemeris (`sweph-wasm`)
 
-Upstream: [ptprashanttripathi/sweph-wasm](https://github.com/ptprashanttripathi/sweph-wasm) · npm: `sweph-wasm`
+Upstream: [ptprashanttripathi/sweph-wasm](https://github.com/ptprashanttripathi/sweph-wasm) · npm: [`sweph-wasm`](https://www.npmjs.com/package/sweph-wasm)
 
-Kept:
-- `src/index.ts` — `SwissEPH` wrapper class
-- `src/utils/` — helpers (errors, path resolution, ephemeris metadata)
-- `src/wasm/swisseph.js`, `swisseph.wasm`, `swisseph.d.ts` — compiled Swiss Ephemeris
-- `package.json`, `README.md`, `LICENSE`
+Installed as a normal app dependency (`package.json`), not copied under `vendor/`. A vendored folder must not reuse the package name `sweph-wasm` or bundlers resolve imports to incomplete `src/` instead of `node_modules/…/dist`.
 
 Produces the planetary longitudes (Sun, Moon, nodes, …) that drive **gate activations** and the **design date**.
 
