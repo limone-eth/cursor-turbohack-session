@@ -1,33 +1,66 @@
-# Vendored upstream libraries
+# Vendored libraries (HD chart essentials)
 
-Snapshots of the open-source projects used by [limone-eth/human-design](https://github.com/limone-eth/human-design) for chart computation and visualization. These are **plain folders** (no submodules, no recursive init), so a normal `git clone` is enough.
+Trimmed, plain-folder snapshots of the open-source projects used by [limone-eth/human-design](https://github.com/limone-eth/human-design) for chart computation and rendering. Only the runtime library files needed to **compute** and **draw** a Human Design chart are kept — no tests, docs sites, demo apps, or build tooling.
 
-## Chart computation (ephemeris, time, timezone)
+Upstream equivalents are installable from npm; these copies exist as readable reference while we build.
 
-| Folder | Upstream | Role in Human Design |
-|--------|----------|----------------------|
-| `sweph-wasm/` | [ptprashanttripathi/sweph-wasm](https://github.com/ptprashanttripathi/sweph-wasm) | Swiss Ephemeris compiled to WebAssembly — planetary longitudes (Sun, Moon, nodes, etc.) used to derive **gates** and the **design date**. |
-| `luxon/` | [moment/luxon](https://github.com/moment/luxon) | Date/time math and formatting (local birth time → UTC, design-time windows). |
-| `tz-lookup/` | [darkskyapp/tz-lookup-oss](https://github.com/darkskyapp/tz-lookup-oss) | OSS lineage of the `tz-lookup` npm package — lat/lng → IANA timezone for correct local→UTC conversion. |
+## Chart computation
 
-Application-side logic (64 gates, channels, centers, authority, profile, incarnation cross, variables) in the reference project is **custom TypeScript** under `lib/human-design/`, not a separate published library.
+### `sweph-wasm/`  — Swiss Ephemeris in WebAssembly
 
-## Bodygraph rendering
+Upstream: [ptprashanttripathi/sweph-wasm](https://github.com/ptprashanttripathi/sweph-wasm) · npm: `sweph-wasm`
 
-| Folder | Upstream | Role |
-|--------|----------|------|
-| `hdkit/` | [jdempcy/hdkit](https://github.com/jdempcy/hdkit) | Open-source Human Design kit — **bodygraph SVG** and gate geometry. (The 236 MB `sample-apps/` folder is intentionally omitted.) |
+Kept:
+- `src/index.ts` — `SwissEPH` wrapper class
+- `src/utils/` — helpers (errors, path resolution, ephemeris metadata)
+- `src/wasm/swisseph.js`, `swisseph.wasm`, `swisseph.d.ts` — compiled Swiss Ephemeris
+- `package.json`, `README.md`, `LICENSE`
 
-## Group / AI “analysis” reports
+Produces the planetary longitudes (Sun, Moon, nodes, …) that drive **gate activations** and the **design date**.
 
-There is **no standalone analysis library** in the reference codebase. Admin “analysis” calls the **OpenRouter** HTTP API (`https://openrouter.ai/api/v1/chat/completions`) with prompts built from structured chart data (`lib/ai/openrouter.ts`). Nothing to vendor — see [openrouter.ai/docs](https://openrouter.ai/docs).
+### `luxon/` — date/time math
+
+Upstream: [moment/luxon](https://github.com/moment/luxon) · npm: `luxon`
+
+Kept:
+- `src/` — entire library source (`datetime.js`, `duration.js`, `zones/*`, `impl/*`, …)
+- `package.json`, `README.md`, `LICENSE.md`
+
+Handles local-birth-time → UTC conversion and design-time windows.
+
+### `tz-lookup/` — lat/lng → IANA timezone
+
+Upstream: [darkskyapp/tz-lookup-oss](https://github.com/darkskyapp/tz-lookup-oss) · npm: `tz-lookup`
+
+Kept:
+- `tz.js` — the compiled lookup function (single-file library)
+- `package.json`, `README.md`, `LICENSE`
+
+Feeds `luxon` the correct zone for the birth location.
+
+## Chart rendering
+
+### `hdkit/` — bodygraph geometry
+
+Upstream: [jdempcy/hdkit](https://github.com/jdempcy/hdkit)
+
+Kept:
+- `hdkit.js` — entry
+- `bodygraph-data.js` — center/channel/gate coordinates
+- `constants.js` — gate, line, planet, and center constants
+- `README.md`, `LICENSE`
+
+Reference layout used when adapting the bodygraph SVG in the reference project (`components/bodygraph/`). The 236 MB `sample-apps/` folder from upstream is **intentionally excluded**.
+
+## Analysis / reports
+
+No third-party library — the reference codebase calls **OpenRouter** directly via `fetch` (`lib/ai/openrouter.ts`). See [openrouter.ai/docs](https://openrouter.ai/docs).
 
 ## Refreshing a snapshot
-
-These folders are read-only references. To update one, re-clone from upstream over the top:
 
 ```bash
 rm -rf vendor/<name>
 git clone --depth 1 <upstream-url> vendor/<name>
 rm -rf vendor/<name>/.git
+# then re-trim to the files listed above
 ```
