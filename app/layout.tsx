@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "BG5 Team Compatibility",
-  description: "Analisi team BG5 con profili individuali e dinamiche di gruppo",
+  description: "BG5-style team and career dynamics: plain-English reports for small teams.",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="it"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-slate-50 text-slate-900">{children}</body>

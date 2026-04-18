@@ -65,8 +65,12 @@ export type TeamReport = {
   members: MemberReport[];
   teamPotential: string[];
   teamFrictions: string[];
+  /** Practical ways leaders and peers can reduce each friction pattern */
+  frictionSupport: string[];
   leverageMoves: string[];
   leakAreas: string[];
+  /** How to shore up weak spots so energy and accountability do not drain */
+  leakSupport: string[];
   bestEnvironmentMix: string;
   collaborationModel: string;
 };

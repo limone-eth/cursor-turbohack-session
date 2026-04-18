@@ -9,7 +9,7 @@ export async function geocodePlace(query: string): Promise<GeocodeResult> {
   const url = new URL("https://geocoding-api.open-meteo.com/v1/search");
   url.searchParams.set("name", query);
   url.searchParams.set("count", "1");
-  url.searchParams.set("language", "it");
+  url.searchParams.set("language", "en");
   url.searchParams.set("format", "json");
 
   const response = await fetch(url, { cache: "no-store" });
@@ -30,11 +30,11 @@ export async function geocodePlace(query: string): Promise<GeocodeResult> {
 
   const hit = payload.results?.[0];
   if (!hit || typeof hit.latitude !== "number" || typeof hit.longitude !== "number") {
-    throw new Error("Luogo non trovato: prova con citta e paese (es. Milano, Italia).");
+    throw new Error("Place not found - try city and country (e.g. London, UK).");
   }
 
   if (!hit.timezone) {
-    throw new Error("Timezone non disponibile per questo luogo.");
+    throw new Error("No timezone available for this place.");
   }
 
   const label = [hit.name, hit.admin1, hit.country].filter(Boolean).join(", ");

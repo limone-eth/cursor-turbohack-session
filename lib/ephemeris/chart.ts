@@ -102,7 +102,7 @@ export function findDesignJulianDayUt(swe: SwissEph, birthJulianDayUt: number): 
     previous = candidate;
   }
 
-  throw new Error("Impossibile calcolare la data di design (finestra 120 giorni insufficiente).");
+  throw new Error("Could not derive design date (120-day search window was not enough).");
 }
 
 function refineDesignJd(swe: SwissEph, lowerJd: number, upperJd: number, birthLon: number): number {

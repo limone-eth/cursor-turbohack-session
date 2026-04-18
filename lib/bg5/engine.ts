@@ -134,8 +134,8 @@ export async function buildMemberReport(
   ];
 
   const advancedTraits = [
-    `Variable signature: Motivation ${motivationSub.gate}.${motivationSub.line} / View ${viewSub.gate}.${viewSub.line}.`,
-    `Design-side signatures: Digestion ${digestionSub.gate}.${digestionSub.line}, Environment ${environmentSub.gate}.${environmentSub.line}.`,
+    `Advanced mapping: personality motivation gate ${motivationSub.gate}, line ${motivationSub.line}; view gate ${viewSub.gate}, line ${viewSub.line}. (The plain-language blocks in the report explain what that tends to feel like at work.)`,
+    `Design-side mapping: digestion gate ${digestionSub.gate}, line ${digestionSub.line}; environment gate ${environmentSub.gate}, line ${environmentSub.line}.`,
   ];
 
   const advancedFriction = [
@@ -226,7 +226,7 @@ export async function buildMemberReport(
       "Escalate blockers with options, not only problems.",
     ].map(bg5Friendly),
     calculationMethod:
-      "Swiss Ephemeris (sweph-wasm) + HD gate/line/color/tone math (hdkit-compatible) + BG5 phrasing layer.",
+      "Chart positions use a high-precision ephemeris; career variables follow BG5 / Human Design mechanics (gates, lines, tones, color).",
   };
 }
 
@@ -242,43 +242,65 @@ export async function buildTeamReport(
   const oc16Hints = oc16TeamHints(members.length);
 
   const teamPotential = [
-    "High complementarity across perspective and execution rhythms.",
-    "Strong leverage when roles are allocated by natural processing style.",
-    "Good potential for fast feedback and learning loops.",
+    "You likely have complementary angles on problems: if you assign work to match how people process, quality goes up.",
+    "Fast feedback loops are possible when expectations and owners are explicit.",
     ...oc16Hints,
   ];
 
   const teamFrictions = [
     digestionSides.size > 1
-      ? "Different work-processing rhythms: some teammates need fast iteration loops, others need recovery between pushes."
-      : "Occasional overload when deadlines compress processing time for more sensitive digestion styles.",
+      ? "Different work rhythms: some people need quick iteration; others need breathing room between pushes."
+      : "Under tight deadlines, people with slower digestion rhythms may feel steamrolled; watch meeting density.",
     environmentSides.size > 1
-      ? "Mixed environment needs: some people stabilize with enclosure and predictability, others need openness and peripheral awareness."
-      : "Environment fit is relatively aligned; friction is more likely to come from role clarity than from space design.",
+      ? "Mixed workspace needs: some focus in enclosed, predictable settings; others need open, peripheral awareness."
+      : "Workspace fit is fairly aligned: most friction will come from unclear roles, not the room itself.",
     motivationLabels.length > 1
-      ? `Motivation diversity (${[...new Set(motivationLabels)].join(", ")}) can create tension if incentives and success metrics are vague.`
-      : "Motivation style is similar across members; watch for groupthink if challenge and dissent are not welcomed.",
+      ? `Different core drives (${[...new Set(motivationLabels)].join(", ")}). If goals and rewards are fuzzy, people can pull in different directions.`
+      : "Similar drives across the group: invite dissent on purpose so you do not slide into groupthink.",
+  ];
+
+  const frictionSupport = [
+    digestionSides.size > 1
+      ? "Alternate formats: live working session + a written recap so slower processors can catch up without another meeting."
+      : "After intense weeks, add a lighter day or async catch-up so people can metabolize work at their pace.",
+    environmentSides.size > 1
+      ? "Offer both quiet focus blocks and open collaboration windows; label them on the calendar so people can plan."
+      : "Keep role boundaries visible in shared docs so environment is not doing the emotional work of unclear ownership.",
+    motivationLabels.length > 1
+      ? "Publish a one-page success definition per initiative: what 'good' looks like, how wins are recognized, and who decides trade-offs."
+      : "Rotate who plays 'critical friend' in reviews so healthy challenge stays normal.",
+    "Use short decision meetings only after a pre-read; decisions should leave with owner, date, and next step.",
   ];
 
   const leverageMoves = [
-    "Pair action-oriented members with review-oriented members during launches.",
-    "Assign work packaging to members with strong contextual framing traits.",
-    "Use two-phase meetings: async pre-read + focused live decision window.",
+    "Pair people who love momentum with people who love review during launches.",
+    "Let the person with the strongest 'big picture' framing own the story deck; executors own the task board.",
+    "Two-step meetings: async context first, then a tight live block for decisions only.",
   ];
 
   const leakAreas = [
-    "No explicit owner for post-meeting follow-ups.",
-    "Context switching overhead between deep work and collaborative windows.",
-    "Unclear criteria for escalation versus local resolution.",
-    "Penta leak: unclear handoff between planning, execution, and quality control.",
+    "Follow-ups after meetings can float with no named owner.",
+    "Jumping between deep work and collaboration without boundaries drains energy.",
+    "People are unsure when to escalate versus solve locally.",
+    "Handoffs between planning, doing, and checking quality are implicit instead of named.",
+  ];
+
+  const leakSupport = [
+    "End every meeting with a visible list: action, owner, due date, posted in one shared thread.",
+    "Protect deep-work blocks on the calendar; cluster meetings so collaboration has a start and end.",
+    "Write a half-page escalation guide: what counts as blocker, who to ping, expected response time.",
+    "Name a 'quality checkpoint' owner for each deliverable so review does not fall through cracks.",
   ];
 
   if (reportMode === "advanced") {
     teamPotential.push(
-      "Advanced read: alignment quality improves when tone-side diversity is mapped into meeting design.",
+      "Advanced: when tone styles differ, design meetings so each person gets the kind of signal they need (written vs verbal, fast vs slow).",
     );
     leakAreas.push(
-      "Advanced leak: mixed side-orientation without explicit collaboration protocol can degrade execution velocity.",
+      "Advanced: mixed collaboration styles without a simple protocol can silently slow shipping; spell out how you work together.",
+    );
+    leakSupport.push(
+      "For mixed styles, publish a lightweight 'how we collaborate' doc: channels, response times, and decision rules.",
     );
   }
 
@@ -287,11 +309,15 @@ export async function buildTeamReport(
     members,
     teamPotential,
     teamFrictions,
+    frictionSupport,
     leverageMoves,
     leakAreas,
-    bestEnvironmentMix: bg5Friendly(`Team works best with hybrid zones that cover: ${environmentLabels.join(", ")}.`),
+    leakSupport,
+    bestEnvironmentMix: bg5Friendly(
+      `This team stays regulated when the environment can flex across: ${environmentLabels.join(", ")}.`,
+    ),
     collaborationModel: bg5Friendly(
-      `Use a BG5-style collaboration cadence: weekly strategic sync + asynchronous daily execution, while honoring motivation mix (${[
+      `Cadence that tends to work: one weekly strategy touchpoint plus async execution updates, respecting the mix of drives (${[
         ...new Set(motivationLabels),
       ].join(", ")}).`,
     ),

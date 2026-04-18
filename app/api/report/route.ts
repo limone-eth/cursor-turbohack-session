@@ -17,11 +17,11 @@ export async function POST(request: Request) {
     try {
       body = (await request.json()) as ReportRequest;
     } catch {
-      return Response.json({ error: "Corpo della richiesta non valido o vuoto." }, { status: 400 });
+      return Response.json({ error: "Invalid or empty request body." }, { status: 400 });
     }
 
     if (!body.members || body.members.length < 3 || body.members.length > 5) {
-      return Response.json({ error: "Servono tra 3 e 5 membri." }, { status: 400 });
+      return Response.json({ error: "Please add between 3 and 5 team members." }, { status: 400 });
     }
 
     const reportMode: ReportMode = body.reportMode === "advanced" ? "advanced" : "professional";
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     const encoded = encodeReport(report);
     return Response.json({ report, encoded, reportMode });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Errore durante la generazione del report.";
+    const message = error instanceof Error ? error.message : "Something went wrong while building the report.";
     console.error("[api/report]", error);
     return Response.json({ error: message }, { status: 500 });
   }

@@ -50,17 +50,17 @@ export function oc16TeamHints(teamSize: number): string[] {
   if (teamSize <= 5) {
     return [
       bg5Friendly(
-        "In a 3-5 person team, treat the group as a small-group field (Penta): define role clarity, handoffs, and who closes loops.",
+        "In a 3-5 person team, name who owns what and who closes each loop; small groups fail quietly when handoffs are fuzzy.",
       ),
       bg5Friendly(
-        "Track Penta leaks weekly: missing ownership, unclear authority, and unclear sequencing are the fastest sources of friction.",
+        "Weekly, scan for missing owners, unclear authority, and fuzzy sequencing; these drain trust faster than hard skills gaps.",
       ),
     ];
   }
 
   return [
     bg5Friendly(
-      "At larger scale, watch the large-group field (WA): hierarchy pressure, power-base tensions, and coordination overhead become dominant.",
+      "In larger groups, hierarchy, power dynamics, and coordination cost usually matter more than individual talent; design for that explicitly.",
     ),
   ];
 }
