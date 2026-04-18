@@ -73,12 +73,21 @@ export default function Home() {
         body: JSON.stringify({ members, reportMode }),
       });
 
-      const payload = (await response.json()) as { encoded?: string; error?: string };
+      const raw = await response.text();
+      let payload: { encoded?: string; error?: string } = {};
+      if (raw.trim()) {
+        try {
+          payload = JSON.parse(raw) as { encoded?: string; error?: string };
+        } catch {
+          throw new Error("Risposta del server non valida (non JSON).");
+        }
+      }
+
       if (!response.ok) {
-        throw new Error(payload.error ?? "Errore durante la generazione del report.");
+        throw new Error(payload.error ?? `Errore HTTP ${response.status}.`);
       }
       if (!payload.encoded) {
-        throw new Error("Risposta API non valida.");
+        throw new Error(payload.error ?? "Risposta API vuota o senza dati codificati.");
       }
 
       router.push(`/report?r=${payload.encoded}`);
