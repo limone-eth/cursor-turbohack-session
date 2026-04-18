@@ -1,3 +1,7 @@
+import "server-only";
+
+import path from "node:path";
+
 import SwissEPH from "@/lib/ephemeris/sweph";
 import { localWallTimeToUtcParts } from "@/lib/geo/timezone";
 import { normalizeLongitude } from "@/lib/hd/gates";
@@ -8,15 +12,26 @@ export type BirthContext = {
   longitude: number;
 };
 
-let cached: SwissEPH | null = null;
+type SwissEph = InstanceType<typeof SwissEPH>;
 
-export async function getSweph(): Promise<SwissEPH> {
+let cached: SwissEph | null = null;
+let initPromise: Promise<SwissEph> | null = null;
+
+export async function getSweph(): Promise<SwissEph> {
   if (cached) return cached;
-  const wasmPath = `${process.cwd()}/public/wasm/swisseph.wasm`;
-  const swe = await SwissEPH.init(wasmPath);
-  await swe.swe_set_ephe_path();
-  cached = swe;
-  return swe;
+  if (!initPromise) {
+    initPromise = (async () => {
+      const wasmPath = path.join(process.cwd(), "node_modules/sweph-wasm/dist/wasm/swisseph.wasm");
+      const swe = await SwissEPH.init(wasmPath);
+      await swe.swe_set_ephe_path();
+      cached = swe;
+      return swe;
+    })().catch((error) => {
+      initPromise = null;
+      throw error;
+    });
+  }
+  return initPromise;
 }
 
 export function zonedDateTimeToUtcParts(
@@ -28,7 +43,7 @@ export function zonedDateTimeToUtcParts(
 }
 
 export function utcPartsToJulianDayUt(
-  swe: SwissEPH,
+  swe: SwissEph,
   parts: ReturnType<typeof zonedDateTimeToUtcParts>,
 ): number {
   const [_, ut] = swe.swe_utc_to_jd(
@@ -43,12 +58,12 @@ export function utcPartsToJulianDayUt(
   return ut;
 }
 
-export function sunLongitudeUt(swe: SwissEPH, julianDayUt: number): number {
+export function sunLongitudeUt(swe: SwissEph, julianDayUt: number): number {
   const pos = swe.swe_calc_ut(julianDayUt, 0, 0);
   return normalizeLongitude(pos[0]);
 }
 
-export function trueNodeLongitudeUt(swe: SwissEPH, julianDayUt: number): number {
+export function trueNodeLongitudeUt(swe: SwissEph, julianDayUt: number): number {
   const pos = swe.swe_calc_ut(julianDayUt, 11, 0);
   return normalizeLongitude(pos[0]);
 }
@@ -61,7 +76,7 @@ function longitudeDelta(from: number, to: number): number {
   return normalizeLongitude(to - from);
 }
 
-export function findDesignJulianDayUt(swe: SwissEPH, birthJulianDayUt: number): number {
+export function findDesignJulianDayUt(swe: SwissEph, birthJulianDayUt: number): number {
   const birthLon = sunLongitudeUt(swe, birthJulianDayUt);
 
   let previous = birthJulianDayUt;
@@ -82,7 +97,7 @@ export function findDesignJulianDayUt(swe: SwissEPH, birthJulianDayUt: number): 
   throw new Error("Impossibile calcolare la data di design (finestra 120 giorni insufficiente).");
 }
 
-function refineDesignJd(swe: SwissEPH, lowerJd: number, upperJd: number, birthLon: number): number {
+function refineDesignJd(swe: SwissEph, lowerJd: number, upperJd: number, birthLon: number): number {
   let low = lowerJd;
   let high = upperJd;
 
